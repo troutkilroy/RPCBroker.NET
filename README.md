@@ -42,7 +42,7 @@ var response = await client.RemoteCall<NegateJsonMsgRequest, NegateJsonMsgRespon
             new NegateJsonMsgRequest() { Value = 1 }, ct.Token, 2000);
 ```
 
-The second RPC call option is to provide the type and serialization information to the client and server. In contrast to using a descendent of `IRPCBytesPayload` (which transmits .NET type information and uses reflection to execute serialization) you define your request and reply objects as you desire and specify the serialization logic explictly. As an example consider our negate method, but this time our message definitions are simple POCO's that don't descend from `IRPCBytesPayload`
+The second RPC call option is to provide the type and serialization information to the client and server. In contrast to using a descendent of `IRPCBytesPayload` (which transmits .NET type information and uses reflection to execute serialization) you define your request and reply objects as you desire, type names, and specify the serialization logic explictly. As an example consider our negate method, but this time our message definitions are simple POCO's that don't descend from `IRPCBytesPayload`
 ```
  public class NegateBytesRequest 
   {
@@ -67,7 +67,7 @@ For the server we define our handler as before, except this time we specify arbi
 
   server.Start();
 ```
-And similarly for the client we specify the request object and methods to seriialize the request and deserialize the response:
+And similarly for the client we specify the request object, type names, and methods to serialize the request and deserialize the response:
 ```
   var client = new RabbitMQRPCClient("localhost", "testqueue", "guest", "guest");
   var ct = new CancellationTokenSource();
