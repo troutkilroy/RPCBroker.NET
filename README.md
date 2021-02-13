@@ -9,7 +9,7 @@ The library uses a message payload class as either inheriting from `IRPCBytesPay
   RPCProtoBufPayload
 ```
 
-To see how this is all put together for client and server, let's create a remote method which negates an integer number and returns the result. Here are our request and reply messages:
+To see how this is all put together for client and server, let's create a remote method which negates an integer and returns the result. Here are our request and reply messages:
 ```
  public class NegateJsonMsgRequest : RPCBinaryJsonPayload
  {
