@@ -24,14 +24,14 @@ To see how this is all put together for client and server, let's create a remote
 ```
  var server = new RabbitMQRPCServer("localhost", "testqueue", "guest", "guest");
  server.RegisterHandler<NegateJsonMsgRequest, NegateJsonMsgResponse>(
-          async (request) =>
-          {
-            var response = new NegateJsonMsgResponse()
-            {
-              Result = -request.Value
-            };
-            return response;
-          });
+   async (request) =>
+   {
+     var response = new NegateJsonMsgResponse()
+     {
+       Result = -request.Value
+     };
+     return response;
+   });
 server.Start();
 ```
 And likewise for the client, we'll create a client instance and call the server endpoint:
