@@ -73,7 +73,7 @@ And similarly for the client we specify the request object, type names, and meth
   var ct = new CancellationTokenSource();
   
   var response = await client.RemoteCall(
-    new NegateProtoMsgRequest() { Value = 1 }),
+    new NegateBytesRequest() { Value = 1 }),
     "NegateRequest",
     "NegateResponse",
     (requestObj) =>
@@ -82,7 +82,7 @@ And similarly for the client we specify the request object, type names, and meth
     },
     (responseBytes) =>
     {
-      return JsonSerializer.Deserialize<NegateProtoMsgResponse>(responseBytes);
+      return JsonSerializer.Deserialize<NegateBytesResponse>(responseBytes);
     },
     ct.Token,
     5000);
