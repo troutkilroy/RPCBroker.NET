@@ -42,7 +42,7 @@ var response = await client.RemoteCall<NegateJsonMsgRequest, NegateJsonMsgRespon
             new NegateJsonMsgRequest() { Value = 1 }, ct.Token, 2000);
 ```
 
-The second RPC call option is to provide the type names and serialization logic to the client and server explicitly. In contrast to using a descendent of `IRPCBytesPayload` (which transmits .NET type information and uses reflection to execute serialization) you define your request and reply objects as you desire, type names, and specify the serialization logic explictly. As an example consider our negate method, but this time our message definitions are simple POCO's that don't descend from `IRPCBytesPayload`
+The second RPC call option is to provide the type names and serialization logic to the client and server explicitly. In contrast to using an implementation of `IRPCBytesPayload` (which transmits .NET type information and uses reflection to execute serialization), you define your request and reply objects as you desire, type names, and specify the serialization logic explictly. As an example consider our negate method, but this time our message definitions are simple POCO's that don't implement `IRPCBytesPayload`
 ```
  public class NegateBytesRequest 
   {
@@ -53,7 +53,7 @@ The second RPC call option is to provide the type names and serialization logic 
     public int Result { get; set; }
   }
 ```
-For the server we define our handler as before, except this time we specify arbitrary message type names and the hander method handles deserialization of the request and serialization of the response:
+For the server we define our handler as before, except this time we specify arbitrary message type names and the hander method is responsible for deserialization of the request and serialization of the response:
 ```
   var server = new RabbitMQRPCServer("localhost", "testqueue", "guest", "guest");
   server.RegisterHandler(
@@ -67,7 +67,7 @@ For the server we define our handler as before, except this time we specify arbi
 
   server.Start();
 ```
-And similarly for the client we specify the request object, type names, and call a RegisterHandlers() method to specify methods to serialize the request and deserialize the response:
+And similarly for the client we specify the request object, type names, and call RegisterHandlers method to specify methods to serialize the request and deserialize the response.
 ```
   var client = new RabbitMQRPCClient("localhost", "testqueue", "guest", "guest");
   var ct = new CancellationTokenSource();
@@ -87,6 +87,17 @@ And similarly for the client we specify the request object, type names, and call
   var response = await client.RemoteCall<NegateBytesRequest, NegateBytesResponse>(
     request,
     "NegateRequest", "NegateResponse",
+    ct.Token,
+    5000);
+```
+You can pass null or empty strings for the type names to the RegisterHandlers and RemoteCall API's. In this case the code will use the .NET request and response type names (i.e., Type.Name). If you do this, it must be done for both RegisterHandlers and RemoteCall for a given pair of types. For example:
+```
+client.RegisterHandlers<NegateBytesRequest,NegateBytesResponse>(
+    null,null,...
+
+var response = await client.RemoteCall<NegateBytesRequest, NegateBytesResponse>(
+    request,
+    nul,null,
     ct.Token,
     5000);
 ```
