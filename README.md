@@ -67,7 +67,7 @@ For the server we define our handler as before, except this time we specify arbi
 
   server.Start();
 ```
-And similarly for the client we specify the request object, type names, and call RegisterHandlers method to specify methods to serialize the request and deserialize the response.
+And similarly for the client we specify the request object, type names, and call the client's `RegisterHandlers` method to specify methods to serialize the request and deserialize the response.
 ```
   var client = new RabbitMQRPCClient("localhost", "testqueue", "guest", "guest");
   var ct = new CancellationTokenSource();
@@ -90,7 +90,7 @@ And similarly for the client we specify the request object, type names, and call
     ct.Token,
     5000);
 ```
-You can pass null or empty strings for the type names to the RegisterHandlers and RemoteCall API's. In this case the code will use the .NET request and response type names (i.e., Type.Name). If you do this, it must be done for both RegisterHandlers and RemoteCall for a given pair of types. For example:
+You can pass null or empty strings for the type names to the `RegisterHandlers` and `RemoteCall` API's. In this case the code will use the .NET request and response type names (i.e., Type.Name). If you do this, it must be done for both `RegisterHandlers` and `RemoteCall` for a given pair of types. For example:
 ```
 client.RegisterHandlers<NegateBytesRequest,NegateBytesResponse>(
     null,null,...
