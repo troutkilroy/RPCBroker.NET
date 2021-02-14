@@ -90,7 +90,7 @@ And similarly for the client we specify the request object, type names, and call
     ct.Token,
     5000);
 ```
-You can pass null or empty strings for the type names to the `RegisterHandlers` and `RemoteCall` API's. In this case the code will use the .NET request and response type names (i.e., Type.Name). If you do this, it must be done for both `RegisterHandlers` and `RemoteCall` for a given pair of types. For example:
+You can pass null or empty strings for the type names to the `RegisterHandlers` and `RemoteCall` API's. In this case the code will use the .NET request and response type names (i.e., [Type.Name](https://docs.microsoft.com/en-us/dotnet/api/system.type.name?view=netstandard-1.6&viewFallbackFrom=net-5.0)). If you do this, it must be done for both `RegisterHandlers` and `RemoteCall` for a given pair of types. For example:
 ```
 client.RegisterHandlers<NegateBytesRequest,NegateBytesResponse>(
     null,null,...
