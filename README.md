@@ -87,7 +87,7 @@ And similarly for the client we specify the request object, type names, and meth
     ct.Token,
     5000);
 ```
-This option might be useful if you want to use just the client implementations of this library to interact with an RPC server enpoint implemented in some other language or environment where you have to adhere to particular type names and serialization. This assumes the server you're interacting with follows the idiomatic implentation for an RPC message exchange. Namely that it reads the standard correlation ID and replyTo headers from the broker message for the request, and uses those in the response.
+This option might be useful if you want to just use the client implementations of this library to interact with an RPC server enpoint implemented in some other language or environment where you have to adhere to particular type names and serialization. This assumes the server you're interacting with follows the idiomatic implentation for an RPC message exchange. Namely that it reads the standard correlation ID and replyTo headers from the broker message for the request, and uses those in the response.
 
 
 
