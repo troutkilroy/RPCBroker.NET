@@ -24,13 +24,13 @@ To see how this is all put together for client and server, let's create a remote
 ```
  var server = new RabbitMQRPCServer("localhost", "testqueue", "guest", "guest");
  server.RegisterHandler<NegateJsonMsgRequest, NegateJsonMsgResponse>(
-   async (request) =>
+   (request) =>
    {
      var response = new NegateJsonMsgResponse()
      {
        Result = -request.Value
      };
-     return response;
+     return Task.FromResult(response);
    });
  server.Start();
 ```
@@ -59,10 +59,10 @@ For the server we define our handler as before, except this time we specify arbi
   server.RegisterHandler(
     "NegateRequest",
     "NegateResponse",
-    async(requestBytes) =>
+    (requestBytes) =>
     {
       var request = JsonSerializer.Deserialize<NegateBytesRequest>(requestBytes);
-      return JsonSerializer.SerializeToUtf8Bytes(new NegateBytesResponse() { Result = -request.Value });
+      return Task.FromResult(JsonSerializer.SerializeToUtf8Bytes(new NegateBytesResponse() { Result = -request.Value }));
     });
 
   server.Start();
