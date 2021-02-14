@@ -13,11 +13,11 @@ To see how this is all put together for client and server, let's create a remote
 ```
  public class NegateJsonMsgRequest : RPCBinaryJsonPayload
  {
-    public int Value { get; set; }
+   public int Value { get; set; }
  }
  public class NegateJsonMsgResponse : RPCBinaryJsonPayload
  {
-    public int Result { get; set; }
+   public int Result { get; set; }
  }
 ```
  Now let's create a server endpoint for the request message that returns a response:
@@ -45,13 +45,13 @@ var response = await client.RemoteCall<NegateJsonMsgRequest, NegateJsonMsgRespon
 The second RPC call option is to provide the type names and serialization logic to the client and server explicitly. In contrast to using an implementation of `IRPCBytesPayload` (which transmits .NET type information and uses reflection to execute serialization), you define your request and reply objects as you desire, type names, and specify the serialization logic explictly. As an example consider our negate method, but this time our message definitions are simple POCO's that don't implement `IRPCBytesPayload`
 ```
  public class NegateBytesRequest 
-  {
-    public int Value { get; set; }
-  }
-  public class NegateBytesResponse 
-  {
-    public int Result { get; set; }
-  }
+ {
+   public int Value { get; set; }
+ }
+ public class NegateBytesResponse 
+ {
+   public int Result { get; set; }
+ }
 ```
 For the server we define our handler as before, except this time we specify arbitrary message type names and the hander method is responsible for deserialization of the request and serialization of the response:
 ```
