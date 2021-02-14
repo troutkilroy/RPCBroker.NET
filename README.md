@@ -101,7 +101,7 @@ var response = await client.RemoteCall<NegateBytesRequest, NegateBytesResponse>(
     ct.Token,
     5000);
 ```
-This option might be useful if you want to just use the client implementations of this library to interact with an RPC server enpoint implemented in some other language or environment where you have to adhere to particular type names and serialization. This assumes the server you're interacting with follows the idiomatic implementation for an RPC message exchange. Namely that it reads the standard correlation ID, Type, and replyTo headers from the broker message for the request, and uses those to construct the response.
+This option might be useful if you want to just use the client implementations of this library to interact with an RPC server enpoint implemented in some other language or environment where you have to adhere to particular type names and serialization. This assumes the server you're interacting with follows the [idiomatic implementation for an RPC message exchange](https://www.rabbitmq.com/tutorials/tutorial-six-python.html). Namely that it reads the standard correlation ID, Type, and replyTo headers from the broker message for the request, and uses those to construct the response.
 
 
 
