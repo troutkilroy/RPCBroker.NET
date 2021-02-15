@@ -1,7 +1,7 @@
 # RPCBroker.NET
 RPC framework for .NET
 
-RPCBroker is a .NET library for creating RPC client and server endpoints using a message broker as transport. This release supprts ActiveMQ and RabbitMQ, and can be expanded to support other brokers or pub/sub systems. The client provides async Task based request/response call semantics. Serialization is configurable and includes binary JSON and [Protocol buffers](https://github.com/protobuf-net/protobuf-net). 
+RPCBroker is a .NET library for creating RPC client and server endpoints using a message broker as transport. This release supports ActiveMQ and RabbitMQ, and can be expanded to support other brokers or pub/sub systems. The client provides async Task based request/response call semantics. Serialization is configurable and includes binary JSON and [Protocol buffers](https://github.com/protobuf-net/protobuf-net). 
 
 The library defines a message payload as a class that implements `IRPCBytesPayload` or you provide a byte array along with serialization methods. Implementing `IRPCBytesPayload` simplifies serialzation and message type identification for both client and server. Two concrete implementations of `IRPCBytesPayload` are provided that you can inherit from:
 ```
