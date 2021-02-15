@@ -53,7 +53,7 @@ The second RPC call option is to provide the type names and serialization logic 
    public int Result { get; set; }
  }
 ```
-For the server we define our handler as before, except this time we specify explicit message type names and the hander method is responsible for deserialization of the request and serialization of the response:
+For the server we define our handler as before, except this time we specify explicit message type names and the handler method is responsible for deserialization of the request and serialization of the response:
 ```
   var server = new RabbitMQRPCServer("localhost", "testqueue", "guest", "guest");
   server.RegisterHandler(
