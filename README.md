@@ -34,7 +34,7 @@ To see how this is all put together for client and server, let's create a remote
    });
  server.Start();
 ```
-Finally for the client, we'll create a client instance and call the server endpoint:
+You can have multiple handlers for different request typess. Finally for the client, we'll create a client instance and call the server endpoint:
 ```
 var client = new RabbitMQRPCClient("localhost", "testqueue", "guest", "guest");
 var ct = new CancellationTokenSource();
