@@ -117,7 +117,7 @@ var response = await client.RemoteCallExplicit<NegateBytesRequest, NegateBytesRe
     ct.Token, null,
     5000);
 ```
-In closing the explicit type and serialization option might be useful if you just want to use this library's RPC client to interact with an RPC server enpoint implemented in some other language or environment where you have to adhere to particular type names and serialization. This assumes the server you're interacting with follows the [idiomatic implementation for an RPC message exchange](https://www.rabbitmq.com/tutorials/tutorial-six-python.html). Namely that it reads the standard correlation ID, Type, and replyTo headers from the broker message for the request, and uses those to construct the response.
+In closing the explicit type and serialization option might be useful if you just want to use this library's RPC client to interact with an RPC server enpoint implemented in some other language or environment where you have to adhere to particular type names and serialization. This assumes the server you're interacting with follows the [idiomatic implementation for an RPC message exchange](https://www.rabbitmq.com/tutorials/tutorial-six-python.html). Namely that it reads the standard correlation ID, Type, and replyTo headers from the broker message for the request, and uses those to construct and route the response.
 
 
 
