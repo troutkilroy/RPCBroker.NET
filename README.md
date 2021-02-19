@@ -44,7 +44,7 @@ Assert.IsTrue(response.Payload.Result == -1);
 ```
 Both client and server use `RPCMessage<TPayload>` which wraps the `IRPCBytesPayload` derived payload object and optional headers that are transmitted by the RPC server or client.
 
-The second RPC call option is to provide the type names and serialization logic to the client and server explicitly. In contrast to using `IRPCBytesPayload` (which transmits .NET type information and uses reflection to execute serialization), here you define your request and reply objects as you desire, type names, and specify the serialization for request and reply objects. As an example consider our negate method, but this time our message definitions are simple POCO's that don't implement `IRPCBytesPayload`
+The second RPC call option is to provide the type names and serialization logic to the client and server explicitly. In contrast to using `IRPCBytesPayload` (which transmits .NET type information and uses reflection to execute serialization), here you define explicit type names, and specify the serialization logic for request and reply objects. As an example consider our negate method, but this time our message definitions are simple POCO's that don't implement `IRPCBytesPayload`
 ```
  public class NegateBytesRequest 
  {
