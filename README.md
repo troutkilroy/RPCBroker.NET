@@ -86,6 +86,8 @@ And similarly for the client we specify the request object, type names, and call
     return JsonSerializer.Deserialize<NegateBytesResponse>(responseBytes);
   });
   
+  var request = new NegateBytesRequest() { Value = 1 };
+  
   var response = await client.RemoteCallExplicit<NegateBytesRequest, NegateBytesResponse>(
     RPCMessage<NegateBytesRequest>.Create(request),
    "NegateRequest",
@@ -106,7 +108,8 @@ client.RegisterExplicitRequestHandler<NegateBytesRequest>(
     
 client.RegisterExplicitResponseHandler<NegateBytesResponse>(
     null,null,...
-
+    
+var request = new NegateBytesRequest() { Value = 1 };
 var response = await client.RemoteCallExplicit<NegateBytesRequest, NegateBytesResponse>(
     RPCMessage<NegateBytesRequest>.Create(request),
     null,
