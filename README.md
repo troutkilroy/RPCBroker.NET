@@ -52,7 +52,7 @@ By default the client transmits, and the server expects, the request object's .N
    public int Result { get; set; }
  }
 ```
-A custom name may be useful if you intend to use on only the client implementation of this library to interact with a broker RPC endpoint written in another langauge or envirnonment where you have to adhere to particular type names. This assumes the server you're interacting with follows the [idiomatic implementation for an RPC message exchange](https://www.rabbitmq.com/tutorials/tutorial-six-python.html). Namely that it reads the standard correlation ID, Type, and replyTo headers from the broker message for the request, and uses those to construct and route the response.
+A custom name may be useful if you intend to use only the client implementation of this library to interact with a broker RPC endpoint written in another langauge or envirnonment where you have to adhere to particular type names. This assumes the server you're interacting with follows the [idiomatic implementation for an RPC message exchange](https://www.rabbitmq.com/tutorials/tutorial-six-python.html). Namely that it reads the standard correlation ID, Type, and replyTo headers from the broker message for the request, and uses those to construct and route the response.
 
 
 
