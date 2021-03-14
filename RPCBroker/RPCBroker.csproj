@@ -1,0 +1,86 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <AssemblyName>RPCBroker</AssemblyName>
+    <RootNamespace>RPCBroker</RootNamespace>
+    <Authors>Jeff Anderson</Authors>
+    <PackageTags>RPC ActiveMQ RabbitMQ</PackageTags>  
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="RPCBroker.ActiveMQ\**" />
+    <Compile Remove="RPCBroker.FakeBroker\**" />
+    <Compile Remove="RPCBroker.FakeRabbitMQ\**" />
+    <Compile Remove="RPCBroker.RabbitMQ\**" />
+    <Compile Remove="RPCBrokerTests\**" />
+    <Compile Remove="src\**" />
+    <Compile Remove="Tests\**" />
+    <EmbeddedResource Remove="RPCBroker.ActiveMQ\**" />
+    <EmbeddedResource Remove="RPCBroker.FakeBroker\**" />
+    <EmbeddedResource Remove="RPCBroker.FakeRabbitMQ\**" />
+    <EmbeddedResource Remove="RPCBroker.RabbitMQ\**" />
+    <EmbeddedResource Remove="RPCBrokerTests\**" />
+    <EmbeddedResource Remove="src\**" />
+    <EmbeddedResource Remove="Tests\**" />
+    <None Remove="RPCBroker.ActiveMQ\**" />
+    <None Remove="RPCBroker.FakeBroker\**" />
+    <None Remove="RPCBroker.FakeRabbitMQ\**" />
+    <None Remove="RPCBroker.RabbitMQ\**" />
+    <None Remove="RPCBrokerTests\**" />
+    <None Remove="src\**" />
+    <None Remove="Tests\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="AMQRPCClient.cs" />
+    <Compile Remove="AMQRPCServer.cs" />
+    <Compile Remove="IRPCClient.cs" />
+    <Compile Remove="IRPCMessage.cs" />
+    <Compile Remove="IRPCServer.cs" />
+    <Compile Remove="RabbitMQRPCServer.cs" />
+    <Compile Remove="RabbMQRPCClient.cs" />
+    <Compile Remove="RPCClient.cs" />
+    <Compile Remove="RPCServer.cs" />
+    <Compile Remove="TestRPCMessages\obj\Debug\netstandard2.1\.NETStandard,Version=v2.1.AssemblyAttributes.cs" />
+    <Compile Remove="TestRPCMessages\TestMessages.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove=".DS_Store" />
+    <None Remove="TestRPCMessages\obj\TestRPCMessages.csproj.nuget.dgspec.json" />
+    <None Remove="TestRPCMessages\obj\TestRPCMessages.csproj.nuget.g.props" />
+    <None Remove="TestRPCMessages\obj\TestRPCMessages.csproj.nuget.g.targets" />
+    <None Remove="TestRPCMessages\obj\project.nuget.cache" />
+    <None Remove="TestRPCMessages\obj\project.assets.json" />
+    <None Remove="TestRPCMessages\obj\Debug\netstandard2.1\TestRPCMessages.csproj.FileListAbsolute.txt" />
+    <None Remove="TestRPCMessages\obj\Debug\netstandard2.1\TestRPCMessages.assets.cache" />
+    <None Remove="TestRPCMessages\obj\Debug\netstandard2.1\TestRPCMessages.csprojAssemblyReference.cache" />
+    <None Remove="TestRPCMessages\obj\Debug\netstandard2.1\TestRPCMessages.csprojAssemblyReference.cache" />
+    <None Remove="TestRPCMessages\obj\project.assets.json" />
+    <None Remove="TestRPCMessages\obj\project.nuget.cache" />
+    <None Remove="TestRPCMessages\obj\TestRPCMessages.csproj.nuget.dgspec.json" />
+    <None Remove="TestRPCMessages\obj\Debug\netstandard2.1\TestRPCMessages.csproj.CoreCompileInputs.cache" />
+    <None Remove="TestRPCMessages\obj\Debug\netstandard2.1\TestRPCMessages.dll" />
+    <None Remove="TestRPCMessages\obj\Debug\netstandard2.1\TestRPCMessages.pdb" />
+    <None Remove="TestRPCMessages\bin\Debug\netstandard2.1\RPCQueue.dll" />
+    <None Remove="TestRPCMessages\bin\Debug\netstandard2.1\RPCQueue.pdb" />
+    <None Remove="TestRPCMessages\obj\Debug\netstandard2.1\TestRPCMessages.csproj.CopyComplete" />
+    <None Remove="TestRPCMessages\bin\Debug\netstandard2.1\TestRPCMessages.deps.json" />
+    <None Remove="TestRPCMessages\bin\Debug\netstandard2.1\TestRPCMessages.dll" />
+    <None Remove="TestRPCMessages\bin\Debug\netstandard2.1\TestRPCMessages.pdb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="src\client\RPCClient.cs" />
+    <Compile Include="src\interfaces\IRPCClient.cs" />
+    <Compile Include="src\interfaces\IRPCSerializer.cs" />
+    <Compile Include="src\interfaces\IRPCServer.cs" />
+    <Compile Include="src\messages\RPCMessage.cs" />
+    <Compile Include="src\messages\RPCTypeNameAttribute.cs" />
+    <Compile Include="src\serializers\RPCJsonSerializer.cs" />
+    <Compile Include="src\serializers\RPCProtoBufSerializer.cs" />
+    <Compile Include="src\server\RPCServer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="protobuf-net" Version="3.0.73" />
+    <PackageReference Include="System.Text.Json" Version="5.0.1" />
+  </ItemGroup>
+</Project>
