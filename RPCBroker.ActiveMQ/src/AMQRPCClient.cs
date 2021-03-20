@@ -17,7 +17,7 @@ namespace RPCBroker.ActiveMQ
 
     private readonly bool asyncSend;
 
-    private readonly ActiveMQQueue requestAMQQueue;
+    private readonly IDestination requestAMQQueue;
 
     private readonly string userName;
 
@@ -45,7 +45,7 @@ namespace RPCBroker.ActiveMQ
       msgTTL = TimeSpan.FromMilliseconds(messageTTLMs);
       persistentSend = persistenMessaging;
       defaultDestination = requestQueueName;
-      requestAMQQueue = string.IsNullOrEmpty(defaultDestination) ? null : new ActiveMQQueue(defaultDestination);
+      requestAMQQueue = string.IsNullOrEmpty(defaultDestination) ? null : GetAMQDestination(defaultDestination);
       userName = amqUser;
       userPassword = amqPswd;
       amqConnectionFactory = new ConnectionFactory(amqUri)
@@ -54,6 +54,19 @@ namespace RPCBroker.ActiveMQ
       };
       if (start)
         Start();
+    }
+
+    private IDestination GetAMQDestination(string destination)
+    {
+      if (destination.StartsWith("queue://"))
+        return new ActiveMQQueue(destination.Substring("queue://".Length));
+      if (destination.StartsWith("temp-queue://"))
+        return new ActiveMQTempQueue(destination.Substring("temp-queue://".Length));
+      if (destination.StartsWith("topic://"))
+        return new ActiveMQTopic(destination.Substring("topic://".Length));
+      if (destination.StartsWith("temp-topic://"))
+        return new ActiveMQTempTopic(destination.Substring("temp-topic://".Length));
+      return new ActiveMQQueue(destination);
     }
 
     private AMQRPCClient()
@@ -83,10 +96,10 @@ namespace RPCBroker.ActiveMQ
 
     protected override void SendBytesToQueue(byte[] bytes, string type, string requestDestination, string correlationId, IEnumerable<KeyValuePair<string, string>> headers)
     {
-      ActiveMQQueue rq = requestAMQQueue;
+      IDestination rq = requestAMQQueue;
       if (!string.IsNullOrEmpty(requestDestination))
       {
-        rq = new ActiveMQQueue(requestDestination);
+        rq = GetAMQDestination(requestDestination);
       }
 
       if (rq == null)
@@ -116,6 +129,7 @@ namespace RPCBroker.ActiveMQ
       {
         msgSender.Send(rq, amqBytesMsg);
       }
+
     }
 
     protected override void StartListening()
@@ -143,6 +157,7 @@ namespace RPCBroker.ActiveMQ
         {
           ReplyQueue = (ActiveMQTempQueue)amqSession.CreateTemporaryQueue()
         };
+        replyToDestination = replyToData.ReplyQueue.GetQueueName();
         replyToData.Consumer = amqSession.CreateConsumer(replyToData.ReplyQueue);
         replyToData.Consumer.Listener += (m) =>
         {

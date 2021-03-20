@@ -13,7 +13,6 @@ namespace RPCBroker.RabbitMQ
     private readonly bool durableReplyTo;
     private readonly ConnectionFactory rmqConectionFactory;
     private bool disposedValue;
-    private string replyToQueue;
     private readonly string replyToExchange;
     private readonly string replyToExchangeRoutingKey;
     private IModel rmqChannel;
@@ -121,7 +120,7 @@ namespace RPCBroker.RabbitMQ
 
       var replyToRoute = !string.IsNullOrEmpty(replyToExchange) && !string.IsNullOrEmpty(replyToExchangeRoutingKey) ?
         $"{replyToExchange}/{replyToExchangeRoutingKey}" :
-          replyToQueue;
+          replyToDestination;
 
       var props = rmqChannel.CreateBasicProperties();
       props.CorrelationId = correlationId;
@@ -154,14 +153,14 @@ namespace RPCBroker.RabbitMQ
             null);
         };
 
-        replyToQueue = rmqChannel.QueueDeclare(string.Empty, durableReplyTo, false).QueueName;
+        replyToDestination = rmqChannel.QueueDeclare(string.Empty, durableReplyTo, false).QueueName;
 
         if (!string.IsNullOrEmpty(replyToExchange) && !string.IsNullOrEmpty(replyToExchangeRoutingKey))
         {
-          rmqChannel.QueueBind(replyToQueue, replyToExchange, replyToExchangeRoutingKey);
+          rmqChannel.QueueBind(replyToDestination, replyToExchange, replyToExchangeRoutingKey);
         }
 
-        rmqChannel.BasicConsume(replyToQueue, true, consumer);
+        rmqChannel.BasicConsume(replyToDestination, true, consumer);
         NotifyConnected();
       }
       catch (Exception e)

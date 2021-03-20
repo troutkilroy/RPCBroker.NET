@@ -9,6 +9,7 @@ namespace RPCBroker
   public abstract class RPCClient : IRPCClient
   {
     protected string defaultDestination;
+    protected string replyToDestination;
     protected IRPCSerializer serializer;
 
     private readonly ConcurrentDictionary<string, TaskCompletionSource<(string type, byte[] bytes, IEnumerable<KeyValuePair<string, string>> headers)>> rpcTasks
@@ -18,7 +19,9 @@ namespace RPCBroker
     private bool running;
 
     public string ServerDestination => defaultDestination;
+    public string ReplyTo => replyToDestination;
     public event UncorrelatedResponseDelegate UncorrelatedResponseEvent;
+    public event ClientLogEventDelegate LogEvent;
 
     public abstract void Dispose();
 
@@ -64,7 +67,9 @@ namespace RPCBroker
           throw new TimeoutException("Timeout waiting for client to connect to broker");
         }
         await waitStartTask;
-        SendBytesToQueue(serializer.Serialize(msg.Payload), RPCMessage<TRequest>.GetPayloadTypeName(), requestDestination, correlationId, msg.Headers);
+        var msgType = RPCMessage<TRequest>.GetPayloadTypeName();
+        SendBytesToQueue(serializer.Serialize(msg.Payload), msgType, requestDestination, correlationId, msg.Headers);
+        LogEvent?.Invoke($"RPC broker msg {msgType} with correlation {correlationId} and replyTo {ReplyTo} sent to {requestDestination}");
         if ((completedTask = await Task.WhenAny(Task.Delay(timeoutWaitMilliseconds, cancel), ts.Task)) == ts.Task)
         {
           var payload = await ts.Task;
@@ -112,10 +117,12 @@ namespace RPCBroker
     protected void NotifyConnected()
     {
       connectWait.SetResult(true);
+      LogEvent?.Invoke($"RPC client with replyTo {ReplyTo} connected to broker");
     }
 
     protected void OnConnectionError(string err)
     {
+      LogEvent?.Invoke($"RPC client with replyTo {ReplyTo} connection error: {err}");
       lock (this)
       {
         if (connectWait.Task.IsCompleted)
@@ -134,6 +141,7 @@ namespace RPCBroker
       if (rpcTasks.TryRemove(correlationId, out TaskCompletionSource<(string type, byte[] bytes, IEnumerable<KeyValuePair<string, string>> headers)> tsk))
       {
         tsk.TrySetResult((type, bytes, headers));
+        LogEvent?.Invoke($"RPC client with replyTo {ReplyTo} received message {type} with correlation {correlationId}");
       }
       else
       {

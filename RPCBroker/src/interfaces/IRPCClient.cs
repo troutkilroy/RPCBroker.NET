@@ -6,15 +6,19 @@ namespace RPCBroker
 {
 
   public delegate void UncorrelatedResponseDelegate(string correlationId, string type);
+  public delegate void ClientLogEventDelegate(string eventTrace);
   public interface IRPCClient : IDisposable
   {
     event UncorrelatedResponseDelegate UncorrelatedResponseEvent;
+    event ClientLogEventDelegate LogEvent;
 
     /// <summary>
     /// Server destination queue name or other routing name
     /// </summary>
     /// <returns></returns>
     string ServerDestination { get; }
+
+    string ReplyTo { get; }
 
     /// <summary>
     /// Send request message to queue. Request and response payloads must implement IRPCBytesPayload.
