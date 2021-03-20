@@ -337,7 +337,7 @@ namespace RPCBrokerTests
       }
       catch (System.TimeoutException)
       {
-        await Task.Delay(20);
+        await Task.Delay(100);
         if (!uncorrelatedReceived)
           Assert.Fail("No uncorrelated event received");
       }
@@ -345,7 +345,6 @@ namespace RPCBrokerTests
       {
         Assert.Fail(e.Message);
       }
-
       
     }
   }

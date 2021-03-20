@@ -138,7 +138,7 @@ namespace RPCBroker
 
     protected void ReceivedBytesFromQueue(byte[] bytes, string type, string correlationId, IEnumerable<KeyValuePair<string, string>> headers)
     {
-      if (rpcTasks.TryRemove(correlationId, out TaskCompletionSource<(string type, byte[] bytes, IEnumerable<KeyValuePair<string, string>> headers)> tsk))
+     if (rpcTasks.TryRemove(correlationId, out TaskCompletionSource<(string type, byte[] bytes, IEnumerable<KeyValuePair<string, string>> headers)> tsk))
       {
         tsk.TrySetResult((type, bytes, headers));
         LogEvent?.Invoke($"RPC client with replyTo {ReplyTo} received message {type} with correlation {correlationId}");
