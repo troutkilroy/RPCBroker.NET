@@ -36,7 +36,7 @@ namespace RPCBroker
     /// <param name="timeoutWaitMilliseconds"></param>
     /// <returns></returns>
     public async Task<RPCMessage<TResponse>> RemoteCall<TRequest, TResponse>(RPCMessage<TRequest> msg,
-      CancellationToken cancel,
+      CancellationToken? cancel = null,
       string requestDestination = null, int timeoutWaitMilliseconds = 10000)
       where TResponse : class
       where TRequest : class
@@ -47,8 +47,6 @@ namespace RPCBroker
         throw new ArgumentNullException($"{nameof(msg)} cannot be null");
       if (serializer == null)
         throw new ArgumentNullException("No seriaizer defined");
-      if (cancel == null)
-        throw new ArgumentNullException($"{nameof(cancel)} cannot be null");
       if (string.IsNullOrEmpty(requestDestination))
         throw new ArgumentException($"{nameof(requestDestination)} is not defined and no default destination specified");
       var correlationId = Guid.NewGuid().ToString();
@@ -62,7 +60,10 @@ namespace RPCBroker
       {
         Task completedTask;
         var waitStartTask = connectWait.Task;
-        if (!waitStartTask.IsCompleted && (await Task.WhenAny(Task.Delay(timeoutWaitMilliseconds, cancel), waitStartTask)) != waitStartTask)
+        var timedWaitStartTask = cancel.HasValue ?
+          Task.WhenAny(Task.Delay(timeoutWaitMilliseconds, cancel.Value), waitStartTask) :
+          Task.WhenAny(Task.Delay(timeoutWaitMilliseconds), waitStartTask);
+        if (!waitStartTask.IsCompleted && await timedWaitStartTask != waitStartTask)
         {
           throw new TimeoutException("Timeout waiting for client to connect to broker");
         }
@@ -70,7 +71,10 @@ namespace RPCBroker
         var msgType = RPCMessage<TRequest>.GetPayloadTypeName();
         SendBytesToQueue(serializer.Serialize(msg.Payload), msgType, requestDestination, correlationId, msg.Headers);
         LogEvent?.Invoke($"RPC broker msg {msgType} with correlation {correlationId} and replyTo {ReplyTo} sent to {requestDestination}");
-        if ((completedTask = await Task.WhenAny(Task.Delay(timeoutWaitMilliseconds, cancel), ts.Task)) == ts.Task)
+        var timedRequestTask = cancel.HasValue ?
+          Task.WhenAny(Task.Delay(timeoutWaitMilliseconds, cancel.Value), ts.Task) :
+          Task.WhenAny(Task.Delay(timeoutWaitMilliseconds), ts.Task);
+        if ((completedTask = await timedRequestTask) == ts.Task)
         {
           var payload = await ts.Task;
           return new RPCMessage<TResponse>(serializer.Deserialize(payload.bytes, typeof(TResponse)) as TResponse, payload.headers);

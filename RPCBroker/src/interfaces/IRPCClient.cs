@@ -30,7 +30,7 @@ namespace RPCBroker
     /// <param name="timeoutWaitMilliseconds">Timeout</param>
     /// <returns>RPCMessage wrapped response payload</returns>
     Task<RPCMessage<TResponse>> RemoteCall<TRequest, TResponse>(RPCMessage<TRequest> msg,
-      CancellationToken cancel,
+      CancellationToken? cancel = null,
       string requestDestination = null, int timeoutWaitMilliseconds = 10000)
       where TResponse : class
       where TRequest : class;
