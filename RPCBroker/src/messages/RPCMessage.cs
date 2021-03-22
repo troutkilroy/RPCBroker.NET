@@ -13,7 +13,7 @@ namespace RPCBroker
     public readonly TPayload Payload;
     public readonly Dictionary<string, string> Headers;
 
-    public static string GetPayloadTypeName()
+    internal static string GetPayloadTypeName()
     {
       var tp = typeof(TPayload);
       var name = tp.Name;
@@ -37,7 +37,32 @@ namespace RPCBroker
       }
       return name;
     }
-   
+
+    public string GetPayloadTypeFromPayload()
+    {
+      var tp = Payload.GetType();
+      var name = tp.Name;
+      var attr = (RPCTypeNameAttribute)System.Attribute.GetCustomAttribute(tp, typeof(RPCTypeNameAttribute));
+      if (attr != null)
+      {
+        RPCTypeNameUsage usage = attr.GetUsage();
+        switch (usage)
+        {
+          case RPCTypeNameUsage.UseName:
+            name = tp.Name;
+            break;
+          case RPCTypeNameUsage.UseFullName:
+            name = tp.FullName;
+            break;
+          case RPCTypeNameUsage.Custom:
+            if (!string.IsNullOrEmpty(attr.name))
+              name = attr.name;
+            break;
+        }
+      }
+      return name;
+    }
+
     private RPCMessage()
     {
     }

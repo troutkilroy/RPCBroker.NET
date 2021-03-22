@@ -68,7 +68,7 @@ namespace RPCBroker
           throw new TimeoutException("Timeout waiting for client to connect to broker");
         }
         await waitStartTask;
-        var msgType = RPCMessage<TRequest>.GetPayloadTypeName();
+        var msgType = msg.GetPayloadTypeFromPayload();
         SendBytesToQueue(serializer.Serialize(msg.Payload), msgType, requestDestination, correlationId, msg.Headers);
         LogEvent?.Invoke($"RPC broker msg {msgType} with correlation {correlationId} and replyTo {ReplyTo} sent to {requestDestination}");
         var timedRequestTask = cancel.HasValue ?

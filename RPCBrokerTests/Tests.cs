@@ -82,6 +82,41 @@ namespace RPCBrokerTests
     }
 
     [TestMethod]
+    public async Task TEST_ANCESTOR_PAYLOAD_JSON()
+    {
+      var server = new FakeRPCServer();
+      server.RegisterHandler<NegateJsonMsgRequest, NegateJsonMsgResponse>(
+          (request, headers) =>
+          {
+            var response = new NegateJsonMsgResponse()
+            {
+              Result = -request.Value
+            };
+            return Task.FromResult(RPCMessage<NegateJsonMsgResponse>.Create(response, null));
+          });
+
+      server.Start();
+
+      try
+      {
+        var client = new FakeRPCClient(server.ServerChannel);
+        client.Start();
+
+        var ct = new CancellationTokenSource();
+
+        var req = (object)new NegateJsonMsgRequest() { Value = 1 };
+        var response = await client.RemoteCall<object, NegateJsonMsgResponse>(
+            RPCMessage<object>.Create(req), ct.Token);
+
+        Assert.IsTrue(response.Payload.Result == -1);
+      }
+      catch (System.Exception e)
+      {
+        Assert.Fail(e.Message);
+      }
+    }
+
+    [TestMethod]
     public async Task TEST_BASIC_PAYLOAD_PROTO()
     {
       var server = new FakeRPCServer(new RPCProtoBufSerializer());
