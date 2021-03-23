@@ -13,9 +13,8 @@ namespace RPCBroker
     public readonly TPayload Payload;
     public readonly Dictionary<string, string> Headers;
 
-    internal static string GetPayloadTypeName()
+    private static string _GetPayLoadTypeName(Type tp)
     {
-      var tp = typeof(TPayload);
       var name = tp.Name;
       var attr = (RPCTypeNameAttribute)System.Attribute.GetCustomAttribute(tp, typeof(RPCTypeNameAttribute));
       if (attr != null)
@@ -36,34 +35,19 @@ namespace RPCBroker
         }
       }
       return name;
+    }
+
+    internal static string GetPayloadTypeName()
+    {
+      return _GetPayLoadTypeName(typeof(TPayload));
     }
 
     public string GetPayloadTypeFromPayload()
     {
-      var tp = Payload.GetType();
-      var name = tp.Name;
-      var attr = (RPCTypeNameAttribute)System.Attribute.GetCustomAttribute(tp, typeof(RPCTypeNameAttribute));
-      if (attr != null)
-      {
-        RPCTypeNameUsage usage = attr.GetUsage();
-        switch (usage)
-        {
-          case RPCTypeNameUsage.UseName:
-            name = tp.Name;
-            break;
-          case RPCTypeNameUsage.UseFullName:
-            name = tp.FullName;
-            break;
-          case RPCTypeNameUsage.Custom:
-            if (!string.IsNullOrEmpty(attr.name))
-              name = attr.name;
-            break;
-        }
-      }
-      return name;
+      return _GetPayLoadTypeName(Payload.GetType());
     }
 
-    private RPCMessage()
+    internal RPCMessage()
     {
     }
 
@@ -76,6 +60,18 @@ namespace RPCBroker
     public static RPCMessage<TPayload> Create(TPayload payload, IEnumerable<KeyValuePair<string, string>> headers = null)
     {
       return new RPCMessage<TPayload>(payload, headers);
+    }
+  }
+
+  public class RPCOpaqueMessage : RPCMessage<object>
+  {
+    public new static RPCOpaqueMessage Create(object payload, IEnumerable<KeyValuePair<string, string>> headers = null) 
+    {
+      return new RPCOpaqueMessage(payload, headers);
+    }
+
+    public RPCOpaqueMessage(object payload, IEnumerable<KeyValuePair<string, string>> headers = null) : base(payload,headers)
+    {
     }
   }
 }

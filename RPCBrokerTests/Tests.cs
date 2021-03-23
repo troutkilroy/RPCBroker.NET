@@ -70,8 +70,8 @@ namespace RPCBrokerTests
 
         var ct = new CancellationTokenSource();
 
-        var response = await client.RemoteCall<NegateJsonMsgRequest, NegateJsonMsgResponse>(
-            RPCMessage<NegateJsonMsgRequest>.Create(new NegateJsonMsgRequest() { Value = 1 }), ct.Token);
+        var response = await client.RemoteCall<NegateJsonMsgResponse>(
+            RPCOpaqueMessage.Create(new NegateJsonMsgRequest() { Value = 1 }), ct.Token);
 
         Assert.IsTrue(response.Payload.Result == -1);
       }
@@ -105,8 +105,8 @@ namespace RPCBrokerTests
         var ct = new CancellationTokenSource();
 
         var req = (object)new NegateJsonMsgRequest() { Value = 1 };
-        var response = await client.RemoteCall<object, NegateJsonMsgResponse>(
-            RPCMessage<object>.Create(req), ct.Token);
+        var response = await client.RemoteCall<NegateJsonMsgResponse>(
+            RPCOpaqueMessage.Create(req), ct.Token);
 
         Assert.IsTrue(response.Payload.Result == -1);
       }
@@ -139,8 +139,8 @@ namespace RPCBrokerTests
 
         var ct = new CancellationTokenSource();
 
-        var response = await client.RemoteCall<NegateProtoMsgRequest, NegateProtoMsgResponse>(
-            RPCMessage<NegateProtoMsgRequest>.Create(new NegateProtoMsgRequest() { Value = 1 }), ct.Token, null, 3000);
+        var response = await client.RemoteCall<NegateProtoMsgResponse>(
+            RPCOpaqueMessage.Create(new NegateProtoMsgRequest() { Value = 1 }), ct.Token, null, 3000);
 
         Assert.IsTrue(response.Payload.Result == -1);
       }
@@ -174,8 +174,8 @@ namespace RPCBrokerTests
 
         var ct = new CancellationTokenSource();
 
-        var response = await client.RemoteCall<NegateJsonMsgRequest, NegateJsonMsgResponse>(
-            RPCMessage<NegateJsonMsgRequest>.Create(new NegateJsonMsgRequest() { Value = 1 }, headers), ct.Token, null, 3000);
+        var response = await client.RemoteCall<NegateJsonMsgResponse>(
+            RPCOpaqueMessage.Create(new NegateJsonMsgRequest() { Value = 1 }, headers), ct.Token, null, 3000);
 
         Assert.IsTrue(response.Headers["key"].Equals("value"));
         Assert.IsTrue(response.Payload.Result == -1);
@@ -209,8 +209,8 @@ namespace RPCBrokerTests
 
         var ct = new CancellationTokenSource();
 
-        var response = await client.RemoteCall<NegateJsonMsgRequestCustom, NegateJsonMsgResponseCustom>(
-            RPCMessage<NegateJsonMsgRequestCustom>.Create(new NegateJsonMsgRequestCustom() { Value = 1 }), ct.Token, null, 3000);
+        var response = await client.RemoteCall<NegateJsonMsgResponseCustom>(
+            RPCOpaqueMessage.Create(new NegateJsonMsgRequestCustom() { Value = 1 }), ct.Token, null, 3000);
       }
       catch (System.Exception e)
       {
@@ -247,8 +247,8 @@ namespace RPCBrokerTests
       foreach (var c in clients)
       {
         var ct = new CancellationTokenSource();
-        requests.Add(c.RemoteCall<NegateJsonMsgRequest, NegateJsonMsgResponse>(
-          RPCMessage<NegateJsonMsgRequest>.Create(new NegateJsonMsgRequest() { Value = 1 }, null),ct.Token, null, 5000));
+        requests.Add(c.RemoteCall<NegateJsonMsgResponse>(
+          RPCOpaqueMessage.Create(new NegateJsonMsgRequest() { Value = 1 }, null),ct.Token, null, 5000));
       }
 
       try
@@ -291,8 +291,8 @@ namespace RPCBrokerTests
 
         await Assert.ThrowsExceptionAsync<System.TimeoutException>(async () =>
         {
-          await client.RemoteCall<NegateJsonMsgRequest, NegateJsonMsgResponse>(
-            RPCMessage<NegateJsonMsgRequest>.Create(new NegateJsonMsgRequest() { Value = 1 }), ct.Token, null, 1000);
+          await client.RemoteCall<NegateJsonMsgResponse>(
+            RPCOpaqueMessage.Create(new NegateJsonMsgRequest() { Value = 1 }), ct.Token, null, 1000);
         });
       }
       catch (System.Exception e)
@@ -328,8 +328,8 @@ namespace RPCBrokerTests
         await Assert.ThrowsExceptionAsync<TaskCanceledException>(async () =>
         {
           ct.CancelAfter(500);
-          await client.RemoteCall<NegateJsonMsgRequest, NegateJsonMsgResponse>(
-            RPCMessage<NegateJsonMsgRequest>.Create(new NegateJsonMsgRequest() { Value = 1 }), ct.Token, null, 1000);
+          await client.RemoteCall<NegateJsonMsgResponse>(
+            RPCOpaqueMessage.Create(new NegateJsonMsgRequest() { Value = 1 }), ct.Token, null, 1000);
         });
       }
       catch (System.Exception e)
@@ -366,8 +366,8 @@ namespace RPCBrokerTests
 
         client.Start();
         var ct = new CancellationTokenSource();
-        await client.RemoteCall<NegateJsonMsgRequest, NegateJsonMsgResponse>(
-          RPCMessage<NegateJsonMsgRequest>.Create(new NegateJsonMsgRequest() { Value = 1 }), ct.Token, null, 10);
+        await client.RemoteCall<NegateJsonMsgResponse>(
+          RPCOpaqueMessage.Create(new NegateJsonMsgRequest() { Value = 1 }), ct.Token, null, 10);
 
       }
       catch (System.TimeoutException)

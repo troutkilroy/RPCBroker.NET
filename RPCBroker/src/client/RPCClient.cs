@@ -93,6 +93,15 @@ namespace RPCBroker
       }
     }
 
+    
+    public Task<RPCMessage<TResponse>> RemoteCall<TResponse>(RPCOpaqueMessage msg,
+      CancellationToken? cancel = null,
+      string requestDestination = null, int timeoutWaitMilliseconds = 10000)
+      where TResponse : class
+    {
+      return RemoteCall<object, TResponse>(msg, cancel, requestDestination, timeoutWaitMilliseconds);
+    }
+
     public void Start()
     {
       lock (this)

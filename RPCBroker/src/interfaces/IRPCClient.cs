@@ -34,6 +34,11 @@ namespace RPCBroker
       string requestDestination = null, int timeoutWaitMilliseconds = 10000)
       where TResponse : class
       where TRequest : class;
+
+    Task<RPCMessage<TResponse>> RemoteCall<TResponse>(RPCOpaqueMessage msg,
+      CancellationToken? cancel = null,
+      string requestDestination = null, int timeoutWaitMilliseconds = 10000)
+      where TResponse : class;
     void Start();
 
     void Stop();
