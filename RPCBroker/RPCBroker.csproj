@@ -6,7 +6,9 @@
     <AssemblyName>RPCBroker</AssemblyName>
     <RootNamespace>RPCBroker</RootNamespace>
     <Authors>Jeff Anderson</Authors>
-    <PackageTags>RPC ActiveMQ RabbitMQ</PackageTags>  
+    <PackageTags>RPC ActiveMQ RabbitMQ</PackageTags>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>RPCBroker.snk</AssemblyOriginatorKeyFile>  
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="RPCBroker.ActiveMQ\**" />
@@ -80,7 +82,7 @@
     <Compile Include="src\server\RPCServer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="protobuf-net" Version="3.0.73" />
-    <PackageReference Include="System.Text.Json" Version="5.0.1" />
+    <PackageReference Include="protobuf-net" Version="3.0.101" />
+    <PackageReference Include="System.Text.Json" Version="5.0.0" />
   </ItemGroup>
 </Project>
