@@ -48,6 +48,8 @@ namespace RPCBroker.ActiveMQ
       requestAMQQueue = string.IsNullOrEmpty(defaultDestination) ? null : GetAMQDestination(defaultDestination);
       userName = amqUser;
       userPassword = amqPswd;
+      if (!amqUri.StartsWith("failover:",StringComparison.OrdinalIgnoreCase))
+        amqUri = $"failover:({amqUri})";
       amqConnectionFactory = new ConnectionFactory(amqUri)
       {
         AsyncSend = asyncSend
