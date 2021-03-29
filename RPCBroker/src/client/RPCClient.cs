@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.Json;
+using System.IO;
 
 namespace RPCBroker
 {
@@ -70,14 +72,17 @@ namespace RPCBroker
         await waitStartTask;
         var msgType = msg.GetPayloadTypeFromPayload();
         SendBytesToQueue(serializer.Serialize(msg.Payload), msgType, requestDestination, correlationId, msg.Headers);
-        LogEvent?.Invoke($"RPC broker msg {msgType} with correlation {correlationId} and replyTo {ReplyTo} sent to {requestDestination}");
+        LogEvent?.Invoke($"RPC send msg {msgType} with correlation {correlationId} and replyTo {ReplyTo} to {requestDestination}. Payload: {JsonSerializer.Serialize(msg.Payload)}");
         var timedRequestTask = cancel.HasValue ?
           Task.WhenAny(Task.Delay(timeoutWaitMilliseconds, cancel.Value), ts.Task) :
           Task.WhenAny(Task.Delay(timeoutWaitMilliseconds), ts.Task);
         if ((completedTask = await timedRequestTask) == ts.Task)
         {
           var payload = await ts.Task;
-          return new RPCMessage<TResponse>(serializer.Deserialize(payload.bytes, typeof(TResponse)) as TResponse, payload.headers);
+          var responseMsg = new RPCMessage<TResponse>(serializer.Deserialize(payload.bytes, typeof(TResponse)) as TResponse, payload.headers);
+          var headersLog = responseMsg.Headers != null ? $"Headers: {string.Join(" ", responseMsg.Headers)}" : "";
+          LogEvent?.Invoke($"RPC received msg {payload.type} with correlation {correlationId} and replyTo {ReplyTo}. Payload: {JsonSerializer.Serialize(responseMsg.Payload)} {headersLog}");
+          return responseMsg;
         }
         else
         {
@@ -151,10 +156,9 @@ namespace RPCBroker
 
     protected void ReceivedBytesFromQueue(byte[] bytes, string type, string correlationId, IEnumerable<KeyValuePair<string, string>> headers)
     {
-     if (rpcTasks.TryRemove(correlationId, out TaskCompletionSource<(string type, byte[] bytes, IEnumerable<KeyValuePair<string, string>> headers)> tsk))
+      if (rpcTasks.TryRemove(correlationId, out TaskCompletionSource<(string type, byte[] bytes, IEnumerable<KeyValuePair<string, string>> headers)> tsk))
       {
         tsk.TrySetResult((type, bytes, headers));
-        LogEvent?.Invoke($"RPC client with replyTo {ReplyTo} received message {type} with correlation {correlationId}");
       }
       else
       {
