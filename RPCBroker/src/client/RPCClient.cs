@@ -78,10 +78,10 @@ namespace RPCBroker
           Task.WhenAny(Task.Delay(timeoutWaitMilliseconds), ts.Task);
         if ((completedTask = await timedRequestTask) == ts.Task)
         {
-          var payload = await ts.Task;
-          var responseMsg = new RPCMessage<TResponse>(serializer.Deserialize(payload.bytes, typeof(TResponse)) as TResponse, payload.headers);
+          var (type, bytes, headers) = await ts.Task;
+          var responseMsg = new RPCMessage<TResponse>(serializer.Deserialize(bytes, typeof(TResponse)) as TResponse, headers);
           var headersLog = responseMsg.Headers != null ? $"Headers: {string.Join(" ", responseMsg.Headers)}" : "";
-          LogEvent?.Invoke($"RPC received msg {payload.type} with correlation {correlationId} and replyTo {ReplyTo}. Payload: {JsonSerializer.Serialize(responseMsg.Payload)} {headersLog}");
+          LogEvent?.Invoke($"RPC received msg {type} with correlation {correlationId} and replyTo {ReplyTo}. Payload: {JsonSerializer.Serialize(responseMsg.Payload)} {headersLog}");
           return responseMsg;
         }
         else

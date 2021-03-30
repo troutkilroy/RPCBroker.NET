@@ -8,10 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="Apache.NMS" Version="1.8.0" />
+    <PackageReference Include="Apache.NMS.ActiveMQ" Version="1.8.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\ActiveMQDotNetUtil\Apache.NMS.ActiveMQ-1.8.0\src\nms-openwire.csproj" />
     <ProjectReference Include="..\RPCBroker\RPCBroker.csproj" />
   </ItemGroup>
 

@@ -170,7 +170,9 @@ namespace RPCBroker.ActiveMQ
               bytesMsg.NMSCorrelationID,
               (from string k in bytesMsg.Properties.Keys
                let vs = bytesMsg.Properties[k.ToString()]
+#pragma warning disable IDE0038 // Use pattern matching
                where vs is string
+#pragma warning restore IDE0038 // Use pattern matching
                select new KeyValuePair<string, string>(k.ToString(), (string)vs)).ToList());
           }
         };
