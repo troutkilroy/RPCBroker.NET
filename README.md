@@ -37,7 +37,11 @@ var response = await client.RemoteCall<NegateJsonMsgRequest, NegateJsonMsgRespon
   RPCMessage<NegateJsonMsgRequest>.Create(new NegateJsonMsgRequest() { Value = 1 }), ct.Token);
 Assert.IsTrue(response.Payload.Result == -1);
 ```
-Both client and server use `RPCMessage<TPayload>` which wraps the request/reply and optional headers that are transmitted by the RPC server or client.
+Both client and server use `RPCMessage<TPayload>` which wraps the request/reply and optional headers that are transmitted by the RPC server or client. As an alternative you can use  `RPCOpaqueMessage` for client RPC requests which doesn't require you to specify the request message type. For example:
+
+```
+await client.RemoteCall<NegateJsonMsgResponse>(RPCOpaqueMessage.Create(new NegateJsonMsgRequest() { Value = 1 }));
+```
 
 By default the client transmits, and the server expects, the request object's .NET type name (via the broker's message type header). This can be controlled with a custom attribute on the request/reply class. The options are .NET type name, full type name, or a custom name that you supply. 
 ```
