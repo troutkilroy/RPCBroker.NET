@@ -43,7 +43,7 @@ Both client and server use `RPCMessage<TPayload>` which wraps the request/reply 
 await client.RemoteCall<NegateJsonMsgResponse>(RPCOpaqueMessage.Create(new NegateJsonMsgRequest() { Value = 1 }));
 ```
 
-By default the client transmits, and the server expects, the request object's .NET type name (via the broker's message type header). This can be controlled with a custom attribute on the request/reply class. The options are .NET type name, full type name, or a custom name that you supply. 
+By default the client transmits, and the server expects, a type name (via the broker's message type header). This can be controlled with a custom attribute on the request/reply class. The options are .NET type name (default), full .NET type name, or a custom name that you supply. 
 ```
  [RPCTypeName(RPCTypeNameUsage.Custom, name = "NEGATE_REQUEST")]
  public class NegateBytesRequest 
