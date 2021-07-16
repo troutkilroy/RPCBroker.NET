@@ -19,6 +19,7 @@ namespace RPCBroker
     string ServerDestination { get; }
 
     string ReplyTo { get; }
+    bool LogPayloadAndHeaders { get; set; }
 
     /// <summary>
     /// Send request message to queue. Request and response payloads must implement IRPCBytesPayload.
