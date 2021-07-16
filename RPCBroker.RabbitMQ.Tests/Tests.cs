@@ -62,10 +62,8 @@ namespace RPCBroker.RabbitMQ.Tests
       {
         var client = new RabbitMQRPCClient("localhost", "guest", "guest", q);
 
-        var ct = new CancellationTokenSource();
-
-        var response = await client.RemoteCall<NegateJsonMsgRequest, NegateJsonMsgResponse>(
-            RPCMessage<NegateJsonMsgRequest>.Create(new NegateJsonMsgRequest() { Value = 1 }), ct.Token);
+        var response = await client.RemoteCall<NegateJsonMsgResponse>(
+            RPCOpaqueMessage.Create(new NegateJsonMsgRequest() { Value = 1 }));
 
         Assert.IsTrue(response.Payload.Result == -1);
       }
@@ -96,10 +94,8 @@ namespace RPCBroker.RabbitMQ.Tests
       {
         var client = new RabbitMQRPCClient("localhost", "guest", "guest", q);
 
-        var ct = new CancellationTokenSource();
-
-        var response = await client.RemoteCall<NegateJsonMsgRequest, NegateJsonMsgResponse>(
-            RPCMessage<NegateJsonMsgRequest>.Create(new NegateJsonMsgRequest() { Value = 1 }), ct.Token);
+        var response = await client.RemoteCall<NegateJsonMsgResponse>(
+            RPCOpaqueMessage.Create(new NegateJsonMsgRequest() { Value = 1 }));
 
         Assert.IsTrue(response.Payload.Result == -1);
         Assert.IsTrue(response.Headers["key"].Equals("value"));
@@ -131,16 +127,85 @@ namespace RPCBroker.RabbitMQ.Tests
       {
         var client = new RabbitMQRPCClient("localhost", "guest", "guest", q, protoSerializer);
 
-        var ct = new CancellationTokenSource();
-
         var response = await client.RemoteCall<NegateProtoMsgRequest, NegateProtoMsgResponse>(
-             RPCMessage<NegateProtoMsgRequest>.Create(new NegateProtoMsgRequest() { Value = 1 }), ct.Token);
+             RPCMessage<NegateProtoMsgRequest>.Create(new NegateProtoMsgRequest() { Value = 1 }));
 
         Assert.IsTrue(response.Payload.Result == -1);
       }
       catch (System.Exception e)
       {
         Assert.Fail(e.Message);
+      }
+    }
+
+    [TestMethod]
+    public async Task TESTRPC_USE_SERVER_REQUEST_EXCHANGE()
+    {
+      var exchange = "testRequestExchange";
+      var routingKey = "testRequestRoutingKey";
+      var q = GetRandomQueue();
+      var server = new RabbitMQRPCServer("localhost", "guest", "guest", q, requestExchange: exchange, requestExchangeRoutingKey: routingKey);
+      server.RegisterHandler<NegateJsonMsgRequest, NegateJsonMsgResponse>(
+          (request, headers) =>
+          {
+            var response = new NegateJsonMsgResponse()
+            {
+              Result = -request.Value
+            };
+            return Task.FromResult(RPCMessage<NegateJsonMsgResponse>.Create(response));
+          });
+
+      server.Start();
+
+      try
+      {
+        var client = new RabbitMQRPCClient("localhost", "guest", "guest", $"{exchange}/{routingKey}");
+
+
+        var response = await client.RemoteCall<NegateJsonMsgResponse>(
+            RPCOpaqueMessage.Create(new NegateJsonMsgRequest() { Value = 1 }));
+
+        Assert.IsTrue(response.Payload.Result == -1);
+
+        response = await client.RemoteCall<NegateJsonMsgResponse>(
+            RPCOpaqueMessage.Create(new NegateJsonMsgRequest() { Value = 1 }), null, $"{exchange}/{routingKey}");
+
+        Assert.IsTrue(response.Payload.Result == -1);
+      }
+      catch (System.Exception e)
+      {
+      }
+    }
+
+    [TestMethod]
+    public async Task TESTRPC_USE_REPLYTO_EXCHANGE()
+    {
+      var q = GetRandomQueue();
+      var server = new RabbitMQRPCServer("localhost", "guest", "guest", q);
+      server.RegisterHandler<NegateJsonMsgRequest, NegateJsonMsgResponse>(
+          (request, headers) =>
+          {
+            var response = new NegateJsonMsgResponse()
+            {
+              Result = -request.Value
+            };
+            return Task.FromResult(RPCMessage<NegateJsonMsgResponse>.Create(response));
+          });
+
+      server.Start();
+
+      try
+      {
+        var client = new RabbitMQRPCClient("localhost", "guest", "guest", q, replyToExchange:"testReplyToExchange",replyToExchangeRoutingKey:"testReplyToExchangeRoutingKey");
+
+        var response = await client.RemoteCall<NegateJsonMsgResponse>(
+            RPCOpaqueMessage.Create(new NegateJsonMsgRequest() { Value = 1 }));
+
+        Assert.IsTrue(response.Payload.Result == -1);
+
+      }
+      catch (System.Exception e)
+      {
       }
     }
 
@@ -170,12 +235,11 @@ namespace RPCBroker.RabbitMQ.Tests
 
         var client = new RabbitMQRPCClient("localhost", "guest", "guest", null, protoSerializer);
 
-        var ct = new CancellationTokenSource();
         await Task.WhenAll(
           serverEndpoints.Select(s =>
           {
             return client.RemoteCall<NegateProtoMsgRequest, NegateProtoMsgResponse>(
-              RPCMessage<NegateProtoMsgRequest>.Create(new NegateProtoMsgRequest() { Value = 1 }), ct.Token, s.DestinationName);
+              RPCMessage<NegateProtoMsgRequest>.Create(new NegateProtoMsgRequest() { Value = 1 }), null, s.DestinationName);
           }));
       }
       catch (Exception e)
@@ -212,9 +276,8 @@ namespace RPCBroker.RabbitMQ.Tests
       List<Task> requests = new List<Task>();
       foreach (var c in clients)
       {
-        var ct = new CancellationTokenSource();
         requests.Add(c.RemoteCall<NegateProtoMsgRequest, NegateProtoMsgResponse>(
-          RPCMessage<NegateProtoMsgRequest>.Create(new NegateProtoMsgRequest() { Value = 1 }), ct.Token));
+          RPCMessage<NegateProtoMsgRequest>.Create(new NegateProtoMsgRequest() { Value = 1 })));
       }
 
       try
