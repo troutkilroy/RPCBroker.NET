@@ -4,6 +4,15 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>RPCBrokerActiveMQ.snk</AssemblyOriginatorKeyFile>
+    <Authors>Jeff Anderson</Authors>
+    <Company />
+    <PackageTags>RPC ActiveMQ</PackageTags>
+    <Description>.NET RPC client and server library for ActiveMQ</Description>
+    <PackageLicenseExpression>Apache</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/troutkilroy/RPCBroker.NET</PackageProjectUrl>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <RepositoryType />
+    <Copyright>Jeff Anderson</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

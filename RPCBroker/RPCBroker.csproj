@@ -8,7 +8,12 @@
     <Authors>Jeff Anderson</Authors>
     <PackageTags>RPC ActiveMQ RabbitMQ</PackageTags>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>RPCBroker.snk</AssemblyOriginatorKeyFile>  
+    <AssemblyOriginatorKeyFile>RPCBroker.snk</AssemblyOriginatorKeyFile>
+    <PackageLicenseExpression>Apache</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/troutkilroy/RPCBroker.NET</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/troutkilroy/RPCBroker.NET</RepositoryUrl>
+    <RepositoryType>github</RepositoryType>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>  
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="RPCBroker.ActiveMQ\**" />
