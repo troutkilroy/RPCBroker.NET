@@ -62,10 +62,8 @@ namespace RPCBroker.ActiveMQ.Tests
 
       var client = new AMQRPCClient("tcp://localhost:61616", "admin", "admin", q);
 
-      var ct = new CancellationTokenSource();
-
-      var response = await client.RemoteCall<NegateJsonMsgRequest, NegateJsonMsgResponse>(
-          RPCMessage<NegateJsonMsgRequest>.Create(new NegateJsonMsgRequest() { Value = 1 }), ct.Token);
+      var response = await client.RemoteCall<NegateJsonMsgResponse>(
+          RPCOpaqueMessage.Create(new NegateJsonMsgRequest() { Value = 1 }));
 
       Assert.IsTrue(response.Payload.Result == -1);
     }
@@ -93,10 +91,8 @@ namespace RPCBroker.ActiveMQ.Tests
 
         var client = new AMQRPCClient("tcp://localhost:61616", "admin", "admin", q);
 
-        var ct = new CancellationTokenSource();
-
-        var response = await client.RemoteCall<NegateJsonMsgRequest, NegateJsonMsgResponse>(
-            RPCMessage<NegateJsonMsgRequest>.Create(new NegateJsonMsgRequest() { Value = 1 }), ct.Token);
+        var response = await client.RemoteCall<NegateJsonMsgResponse>(
+            RPCOpaqueMessage.Create(new NegateJsonMsgRequest() { Value = 1 }));
 
         Assert.IsTrue(response.Payload.Result == -1);
         Assert.IsTrue(response.Headers["key"].Equals("value"));
@@ -133,10 +129,8 @@ namespace RPCBroker.ActiveMQ.Tests
         var client = new AMQRPCClient("tcp://localhost:61616", "admin", "admin",
           q, protoSerializer);
 
-        var ct = new CancellationTokenSource();
-
         var response = await client.RemoteCall<NegateProtoMsgRequest, NegateProtoMsgResponse>(
-               RPCMessage<NegateProtoMsgRequest>.Create(new NegateProtoMsgRequest() { Value = 1 }), ct.Token);
+               RPCMessage<NegateProtoMsgRequest>.Create(new NegateProtoMsgRequest() { Value = 1 }));
 
         Assert.IsTrue(response.Payload.Result == -1);
       }
@@ -166,7 +160,6 @@ namespace RPCBroker.ActiveMQ.Tests
           });
 
       server.Start();
-      var ct = new CancellationTokenSource();
 
       List<AMQRPCClient> clients = new List<AMQRPCClient>();
       for (int i = 0; i < 10; i++)
@@ -181,7 +174,7 @@ namespace RPCBroker.ActiveMQ.Tests
           clients.Select(c =>
           {
             return c.RemoteCall<NegateProtoMsgRequest, NegateProtoMsgResponse>(
-              RPCMessage<NegateProtoMsgRequest>.Create(new NegateProtoMsgRequest() { Value = 1 }), ct.Token);
+              RPCMessage<NegateProtoMsgRequest>.Create(new NegateProtoMsgRequest() { Value = 1 }));
           }));
       }
       catch
@@ -214,15 +207,13 @@ namespace RPCBroker.ActiveMQ.Tests
 
       var client = new AMQRPCClient("tcp://localhost:61616", "admin", "admin", null, protoSerializer);
 
-      var ct = new CancellationTokenSource();
-
       try
       {
         await Task.WhenAll(
           serverEndpoints.Select(s =>
           {
-            return client.RemoteCall<NegateProtoMsgRequest, NegateProtoMsgResponse>(
-              RPCMessage<NegateProtoMsgRequest>.Create(new NegateProtoMsgRequest() { Value = 1 }), ct.Token, s.DestinationName);
+            return client.RemoteCall<NegateProtoMsgResponse>(
+              RPCOpaqueMessage.Create(new NegateProtoMsgRequest() { Value = 1 }), null, s.DestinationName);
           }));
       }
       catch
