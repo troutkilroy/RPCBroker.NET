@@ -39,9 +39,8 @@ namespace RPCBroker.RabbitMQ
     /// If enabled the RPC server must enable durable request queue</param>
     /// <param name="messageTTLMs">Message TTL in Ms. Default is 10s</param>
     /// <param name="replyToExchange">replyTo exchange to be used for server response. If specifying
-    /// replyToExchange, the client code DOES NOT declare the exchange so it must exist in advance.
-    /// However the client will bind the replyTo queue to the replyToExchange and replyToExchangeRoutingKey
-    /// as long as both are specified.</param>
+    /// replyToExchange, the client code declares the exchange as direct and will bind the replyTo
+    /// queue to the replyToExchange and replyToExchangeRoutingKey as long as both are specified.</param>
     /// <param name="replyToExchangeRoutingKey">replyTo exchange routing to be used for server response</param>
     /// <param name="virtualHost"></param>
     public RabbitMQRPCClient(
@@ -157,6 +156,7 @@ namespace RPCBroker.RabbitMQ
 
         if (!string.IsNullOrEmpty(replyToExchange) && !string.IsNullOrEmpty(replyToExchangeRoutingKey))
         {
+          rmqChannel.ExchangeDeclare(replyToExchange, "direct", durableReplyTo);
           rmqChannel.QueueBind(replyToDestination, replyToExchange, replyToExchangeRoutingKey);
         }
 

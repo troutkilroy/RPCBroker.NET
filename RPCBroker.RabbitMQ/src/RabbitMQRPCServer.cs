@@ -19,13 +19,11 @@ namespace RPCBroker.RabbitMQ
 
     /// <summary>
     /// Specify RPC server endpoint by queue name, exchange, and exchange routing key.
-    /// NOTE: If using an exchange this code DOES NOT declare the exchange  Caller is responsilbe for
-    /// exchange creation and lifetime. However it does declare the queue specified and binds it
-    /// to requestExchange (if specified). The queue is declared auto delete and non-exclusive with durabiltiy
-    /// set from durableRequestQueue (default is true).
+    /// The queue is declared auto delete and non-exclusive with durabiltiy set from
+    /// durableRequestQueue (default is true).
     ///
     /// Note on Queue to Exchange Binding:
-    /// 1. If requestExchange is null or empty, then default routing is assumed with routing by queue name
+    /// 1. If requestExchange is null or empty, then default routing is assumed with routing by requestQueueName
     ///    (requestExchangeRoutingKey is ignored)
     /// 2. If requestExchange is specified and requestExchangeRoutingKey is null, exhange will be ignored
     ///    and routing is same as (1).
@@ -128,6 +126,7 @@ namespace RPCBroker.RabbitMQ
         rmqChannel.QueueDeclare(destinationName, durableReceive, false);
         if (!string.IsNullOrEmpty(rmqExchange) && !string.IsNullOrEmpty(rmqExchangeRouting))
         {
+          rmqChannel.ExchangeDeclare(rmqExchange, "direct", durableReceive);
           rmqChannel.QueueBind(destinationName, rmqExchange, rmqExchangeRouting);
         }
 
