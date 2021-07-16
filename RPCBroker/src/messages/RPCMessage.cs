@@ -19,8 +19,7 @@ namespace RPCBroker
       var attr = (RPCTypeNameAttribute)System.Attribute.GetCustomAttribute(tp, typeof(RPCTypeNameAttribute));
       if (attr != null)
       {
-        RPCTypeNameUsage usage = attr.GetUsage();
-        switch (usage)
+        switch (attr.GetUsage())
         {
           case RPCTypeNameUsage.UseName:
             name = tp.Name;
