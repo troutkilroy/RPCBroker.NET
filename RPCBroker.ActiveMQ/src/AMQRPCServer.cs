@@ -19,7 +19,7 @@ namespace RPCBroker.ActiveMQ
     private IMessageConsumer msgReceiver;
     private IMessageProducer msgSender;
 
-    public AMQRPCServer(string uri, string name, string pswd, string requestQueue, IRPCSerializer serializer = null, bool asyncSend = true, int messageTTLMs = 10000)
+    public AMQRPCServer(string uri, string name, string pswd, string requestQueue, IRPCSerializer serializer = null, bool asyncSend = true, bool ensureFailover = true, int messageTTLMs = 10000)
     {
       this.serializer = serializer ?? new RPCJsonSerializer();
       this.asyncSend = asyncSend;
@@ -27,7 +27,9 @@ namespace RPCBroker.ActiveMQ
       destinationName = requestQueue;
       userName = name;
       userPassword = pswd;
-      amqConnectionFactory = new ConnectionFactory($"failover:({uri})")
+      if (ensureFailover && !uri.StartsWith("failover:", StringComparison.OrdinalIgnoreCase))
+        uri = $"failover:({uri})";
+      amqConnectionFactory = new ConnectionFactory(uri)
       {
         AsyncSend = true
       };
@@ -82,11 +84,9 @@ namespace RPCBroker.ActiveMQ
         ((Connection)amqConnection).AsyncSend = asyncSend;
         amqConnection.AcknowledgementMode = AcknowledgementMode.AutoAcknowledge;
         // We're specifying this timeout as otherwise IConnection.Start()
-        // hangs indefinetly on initial connect in certain cases like no
-        // DNS response to the connection URI, network unavailable conditions or
-        // SSL negotiation failure. It's really an odd design in the .NET
-        // Apache client as IO exceptions in the call path of Start()
-        // are black-holed internally while a monitor waits (with this timeout) to
+        // hangs on initial connect in certain cases like no DNS response or network error.
+        // The Apache client has IO exceptions raised in the Start() call path, but
+        // they are black-holed internally while a monitor waits (with this timeout) to
         // send a handshake message on a socket that can't connect. At least
         // this way, we get an IOException albeit somewhat indirect to the
         // underlying cause.
