@@ -97,7 +97,7 @@ namespace RPCBroker
         if (!handlers.TryGetValue(type, out (Func<object, IEnumerable<KeyValuePair<string, string>>, Task<ResponsePayloadData>> handler,
           Type requestType) handlerTuple))
         {
-          ErrorLog?.Invoke($"Request message processing failed. No handler for received message of type: {type}");
+          ErrorLog?.Invoke($"Request msg processing failed. No handler for received msg of type: {type}");
           return;
         }
 
@@ -108,23 +108,35 @@ namespace RPCBroker
           if (r.IsFaulted)
           {
             var ex = r.Exception.InnerExceptions.Count == 1 ? r.Exception.InnerException.Message : r.Exception.Message;
-            ErrorLog?.Invoke($"Response message processing failed. Response handler processing message {correlationId} of type {type} threw exception: {ex}");
+            ErrorLog?.Invoke($"Response msg processing failed. Response handler processing msg {correlationId} of type {type} threw exception: {ex}");
             return;
           }
           try
           {
+            if (string.IsNullOrEmpty(replyTo))
+            {
+              ErrorLog?.Invoke($"Msg with correlation {correlationId} has no replyTo specified. Response will not be sent");
+              return;
+            }
+            if (string.IsNullOrEmpty(correlationId))
+            {
+              ErrorLog?.Invoke($"Msg of type {type} and replyTo {replyTo} has no correlationId. Response will not be sent");
+              return;
+            }
+
             SendBytesPayloadResponse(serializer.Serialize(r.Result.responseObject),
-                        replyTo, r.Result.responseType, correlationId, r.Result.headers);
+              replyTo, r.Result.responseType, correlationId, r.Result.headers);
+           
           }
           catch (Exception e)
           {
-            ErrorLog?.Invoke($"SendBytesPayloadResponse exception: {e.Message}");
+            ErrorLog?.Invoke($"SendBytesPayloadResponse exception processing message with correlation {correlationId}: {e.Message}");
           }
         });
       }
       catch (Exception e)
       {
-        ErrorLog?.Invoke($"Response message processing failed. Exception: {e.Message}");
+        ErrorLog?.Invoke($"Response msg processing failed for msg with correlation {correlationId}. Exception: {e.Message}");
       }
     }
 

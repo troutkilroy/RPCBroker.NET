@@ -24,6 +24,7 @@ namespace RPCBroker
     public string ReplyTo => replyToDestination;
     public event UncorrelatedResponseDelegate UncorrelatedResponseEvent;
     public event ClientLogEventDelegate LogEvent;
+    public bool LogPayloadAndHeaders { get; set; }
 
     public abstract void Dispose();
 
@@ -56,7 +57,7 @@ namespace RPCBroker
       var ts = new TaskCompletionSource<(string type, byte[] bytes, IEnumerable<KeyValuePair<string, string>> headers)>(TaskCreationOptions.RunContinuationsAsynchronously);
       if (!rpcTasks.TryAdd(correlationId, ts))
       {
-        throw new InvalidOperationException("Message CorrelationID already in use");
+        throw new InvalidOperationException("Msg CorrelationID already in use");
       }
       try
       {
@@ -72,7 +73,13 @@ namespace RPCBroker
         await waitStartTask;
         var msgType = msg.GetPayloadTypeFromPayload();
         SendBytesToQueue(serializer.Serialize(msg.Payload), msgType, requestDestination, correlationId, msg.Headers);
-        LogEvent?.Invoke($"RPC send msg {msgType} with correlation {correlationId} and replyTo {ReplyTo} to {requestDestination}. Payload: {JsonSerializer.Serialize(msg.Payload)}");
+        if (LogEvent != null)
+        {
+          var lgTrace = $"RPC send msg {msgType} with correlation {correlationId} and replyTo {ReplyTo} to {requestDestination}";
+          if (LogPayloadAndHeaders)
+            lgTrace += $" Payload: {JsonSerializer.Serialize(msg.Payload)}";
+          LogEvent.Invoke(lgTrace);
+        }
         var timedRequestTask = cancel.HasValue ?
           Task.WhenAny(Task.Delay(timeoutWaitMilliseconds, cancel.Value), ts.Task) :
           Task.WhenAny(Task.Delay(timeoutWaitMilliseconds), ts.Task);
@@ -80,15 +87,24 @@ namespace RPCBroker
         {
           var (type, bytes, headers) = await ts.Task;
           var responseMsg = new RPCMessage<TResponse>(serializer.Deserialize(bytes, typeof(TResponse)) as TResponse, headers);
-          var headersLog = responseMsg.Headers != null ? $"Headers: {string.Join(" ", responseMsg.Headers)}" : "";
-          LogEvent?.Invoke($"RPC received msg {type} with correlation {correlationId} and replyTo {ReplyTo}. Payload: {JsonSerializer.Serialize(responseMsg.Payload)} {headersLog}");
+          if (LogEvent != null)
+          {
+            var lgTrace = $"RPC received msg {type} with correlation {correlationId} and replyTo {ReplyTo}";
+            if (LogPayloadAndHeaders)
+            {
+              var headersLog = responseMsg.Headers != null ? $"Headers: {string.Join(" ", responseMsg.Headers)}" : "";
+              lgTrace += $"  Payload: {JsonSerializer.Serialize(responseMsg.Payload)} {headersLog}";
+            }
+            LogEvent.Invoke(lgTrace);
+          } 
           return responseMsg;
         }
         else
         {
           // if cancelled throws here...
           await completedTask;
-          throw new TimeoutException("Timeout waiting for response");
+          LogEvent?.Invoke($"RPC msg with correlation {correlationId} and replyTo {ReplyTo} timed out due to no response");
+          throw new TimeoutException($"Timeout waiting for response for msg with correlation {correlationId}");
         }
       }
       catch
