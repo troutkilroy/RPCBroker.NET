@@ -9,7 +9,7 @@
     <PackageTags>RPC ActiveMQ RabbitMQ</PackageTags>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>RPCBroker.snk</AssemblyOriginatorKeyFile>
-    <PackageLicenseExpression>Apache</PackageLicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/troutkilroy/RPCBroker.NET</PackageProjectUrl>
     <RepositoryUrl>https://github.com/troutkilroy/RPCBroker.NET</RepositoryUrl>
     <RepositoryType>github</RepositoryType>
