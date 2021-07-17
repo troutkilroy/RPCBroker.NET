@@ -1,11 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Jeff Anderson</Authors>
-    <PackageLicenseExpression>Apache</PackageLicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/troutkilroy/RPCBroker.NET</PackageProjectUrl>
     <Description>.NET RPC client and server library for RabbitMQ</Description>
+    <Version>1.0.0-rc</Version>
+    <Copyright>Jeff Anderson</Copyright>
+    <PackageTags>RPC RabbitMQ</PackageTags>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>RPCBrokerRabbitMQ.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +19,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RPCBroker\RPCBroker.csproj" />
+    <ProjectReference Include="..\RPCBroker\RPCBroker.csproj">
+    <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    <IncludeAssets>RPCBroker.dll</IncludeAssets>
+    </ProjectReference>
   </ItemGroup>
+
+  <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))"/>
+    </ItemGroup>
+  </Target>
 
 </Project>
