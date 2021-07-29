@@ -22,9 +22,9 @@ namespace RPCBroker.RabbitMQ
     /// The client will declare a temporary queue for the replyTo queue.  If replyToExchange is
     /// not specified, default routing is used.
     /// </summary>
-    /// <param name="host"></param>
-    /// <param name="name"></param>
-    /// <param name="pswd"></param>
+    /// <param name="host">Host to use for default connection factory used to create connection. Only used if connectionFactory is null</param>
+    /// <param name="name">Name to use for default connection factory used to create connection. Only used if connectionFactory is null</param>
+    /// <param name="pswd">Password to use for default connection factory used to create connection. Only used if connectionFactory is null</param>
     /// <param name="serverRoutingKey">
     /// This defines the default destination route for client to server RPC request messages.
     /// If the RPC server uses default RabbitMQ routing (no exchange), then serverRoutingKey should be set
@@ -34,6 +34,9 @@ namespace RPCBroker.RabbitMQ
     ///
     /// serverRoutingKey can also be null (or empty) in which case the client must specify routing
     /// (requestDestination argument) when making an RPC request.</param>
+    /// <param name="serializer">Serializer. If null default serializer is binary JSON</param>
+    /// <param name="connectionFactory">RabbitMQ connection factory. If null a default, non SSL enabled, connection factory will be created internally using host, name, pswd and virtualHost</param>
+    /// <param name="start">If true start listener (default is true)</param>
     /// <param name="durableReplyTo">If true replyTo queue is created as durable</param>
     /// <param name="persistentSend">True if client to server messages are set as persistent.
     /// If enabled the RPC server must enable durable request queue</param>
@@ -42,13 +45,14 @@ namespace RPCBroker.RabbitMQ
     /// replyToExchange, the client code declares the exchange as direct and will bind the replyTo
     /// queue to the replyToExchange and replyToExchangeRoutingKey as long as both are specified.</param>
     /// <param name="replyToExchangeRoutingKey">replyTo exchange routing to be used for server response</param>
-    /// <param name="virtualHost"></param>
+    /// <param name="virtualHost">Virtual host to use for default connection factory used to create connection. Only used if connectionFactory is null</param>
     public RabbitMQRPCClient(
       string host,
       string name,
       string pswd,
       string serverRoutingKey,
       IRPCSerializer serializer = null,
+      ConnectionFactory connectionFactory = null,
       bool start = true,
       string replyToExchange = null,
       string replyToExchangeRoutingKey = null,
@@ -65,7 +69,7 @@ namespace RPCBroker.RabbitMQ
       msgTTLMs = messageTTLMs;
       defaultDestination = serverRoutingKey;
 
-      rmqConectionFactory = new ConnectionFactory()
+      rmqConectionFactory = connectionFactory ?? new ConnectionFactory()
       {
         HostName = host,
         UserName = name,

@@ -36,17 +36,19 @@ namespace RPCBroker.RabbitMQ
     ///    The server queue name would not be used by the client in this case as the message has to be sent
     ///    to the exchange.
     /// </summary>
-    /// <param name="host"></param>
-    /// <param name="name"></param>
-    /// <param name="pswd"></param>
+    /// <param name="host">Host to use for default connection factory used to create connection. Only used if connectionFactory is null</param>
+    /// <param name="name">Name to use for default connection factory used to create connection. Only used if connectionFactory is null</param>
+    /// <param name="pswd">Password to use for default connection factory used to create connection. Only used if connectionFactory is null</param>
     /// <param name="requestQueueName"></param>
+    /// <param name="serializer">Serializer. If null default serializer is binary JSON</param>
+    /// <param name="connectionFactory">RabbitMQ connection factory. If null a default, non SSL enabled, connection factory will be created using host, name, pswd and virtualHost</param>
     /// <param name="requestExchange"></param>
     /// <param name="requestExchangeRoutingKey"></param>
     /// <param name="durableRequestQueue"></param>
     /// <param name="messageTTLMs"></param>
-    /// <param name="virtualHost"></param>
+    /// <param name="virtualHost">Virtual host to use for default connection factory used to create connection. Only used if connectionFactory is null</param>
     public RabbitMQRPCServer(string host, string name, string pswd,
-      string requestQueueName, IRPCSerializer serializer = null, string requestExchange = null, string requestExchangeRoutingKey = null,
+      string requestQueueName, IRPCSerializer serializer = null, ConnectionFactory connectionFactory = null, string requestExchange = null, string requestExchangeRoutingKey = null,
       bool durableRequestQueue = true, int messageTTLMs = 10000, string virtualHost = "/")
     {
       this.serializer = serializer ?? new RPCJsonSerializer();
@@ -55,7 +57,7 @@ namespace RPCBroker.RabbitMQ
       rmqExchangeRouting = requestExchangeRoutingKey;
       destinationName = requestQueueName;
       msgTTLMs = messageTTLMs;
-      rmqConectionFactory = new ConnectionFactory()
+      rmqConectionFactory = connectionFactory ?? new ConnectionFactory()
       {
         HostName = host,
         UserName = name,
