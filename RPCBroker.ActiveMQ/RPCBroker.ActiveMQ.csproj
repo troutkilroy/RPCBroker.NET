@@ -14,12 +14,14 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <RepositoryType />
     <Copyright>Jeff Anderson</Copyright>
-    <Version>1.0.0-rc</Version>
+    <Version>1.0.1-rc</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Apache.NMS" Version="1.8.0" />
     <PackageReference Include="Apache.NMS.ActiveMQ" Version="1.8.0" />
+    <PackageReference Include="protobuf-net" Version="3.0.101" />
+    <PackageReference Include="System.Text.Json" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,7 +33,7 @@
 
   <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">
     <ItemGroup>
-      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))"/>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
     </ItemGroup>
   </Target>
 
